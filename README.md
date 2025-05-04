@@ -49,11 +49,6 @@ Automatically generate a Table of Contents for your posts based on headings with
 
 == Installation ==
 
-### Automatic Installation
-1. Log in to your WordPress admin panel and navigate to "Plugins > Add New".
-2. Search for "Smart TOC".
-3. Click "Install Now" and then "Activate".
-
 ### Manual Installation
 1. Download the plugin zip file.
 2. Log in to your WordPress admin panel and navigate to "Plugins > Add New".
@@ -78,9 +73,6 @@ Yes, you can disable automatic insertion and use the `[smart_toc]` shortcode to 
 
 = Will the TOC work with my theme? =
 Smart TOC is designed to work with any properly coded WordPress theme. The plugin uses its own styling that adapts to your theme's design.
-
-= Does the TOC support all languages? =
-Yes, Smart TOC works with any language supported by WordPress, including RTL languages.
 
 = What if I don't want the TOC on a specific post? =
 You can disable the TOC for individual posts or pages through a meta box in the editor.
