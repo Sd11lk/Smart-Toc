@@ -1,9 +1,11 @@
 # Smart-Toc
-Smart TOC is a simple WordPress plugin that auto-generates a Table of Contents from post headings (&lt;h2>–&lt;h6>). It adds anchor links for easy navigation, improving UX and SEO. Lightweight, clean, and easy to use—just install and activate.# Smart-Toc
+Smart TOC is a simple WordPress plugin that auto-generates a Table of Contents from post headings (&lt;h2>–&lt;h6>). It adds anchor links for easy navigation, improving UX and SEO. Lightweight, clean, and easy to use—just install and activate.
+
+# Smart-Toc
 
 Smart TOC is a simple WordPress plugin that auto-generates a Table of Contents from post headings (<h2>–<h6>). It adds anchor links for easy navigation, improving UX and SEO. Lightweight, clean, and easy to use—just install and activate.
 
-\=== Smart TOC - Auto Table of Contents ===
+=== Smart TOC - Auto Table of Contents ===
 Contributors: Savio Dcruz
 Tags: table of contents, toc, navigation, headings, content, indexing
 Requires at least: 5.0
@@ -15,7 +17,7 @@ License URI: [http://www.gnu.org/licenses/gpl-2.0.html](http://www.gnu.org/licen
 
 Automatically generate a Table of Contents for your posts based on headings with smooth styling and advanced customization options.
 
-\== Description ==
+== Description ==
 
 **Smart TOC** makes it easy to add a professional Table of Contents to your WordPress posts and pages. Improve your content navigation, boost SEO, and enhance user experience by helping readers quickly find what they're looking for.
 
@@ -68,7 +70,7 @@ Automatically generate a Table of Contents for your posts based on headings with
 2. Choose your preferred settings for TOC position, heading levels, and styling.
 3. Start creating or editing content with headings to see the TOC in action!
 
-\== Frequently Asked Questions ==
+== Frequently Asked Questions ==
 
 \= Can I customize the appearance of the TOC? =
 Absolutely! You can customize the TOC through the settings page using custom CSS. The plugin includes a built-in field for adding your custom styles.
