@@ -84,15 +84,6 @@ Automatically generate a Table of Contents for your posts based on headings with
 \= Can I change the TOC title? =
 <br>Yes, you can customize the title of the TOC from the settings page.
 
-\== Screenshots ==
-
-1. Example of the Smart TOC in action on a post
-2. Plugin settings page
-3. Editor meta box for per-post control
-4. TinyMCE button for shortcode insertion
-5. TOC with hierarchical display
-6. TOC on mobile devices
-
 \== Changelog ==
 
 \= 2.0.0 =
