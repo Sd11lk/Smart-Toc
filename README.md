@@ -1,16 +1,16 @@
 # Smart-Toc
 
-Smart TOC is a simple WordPress plugin that auto-generates a Table of Contents from post headings (<h2>–<h6>). It adds anchor links for easy navigation, improving UX and SEO. Lightweight, clean, and easy to use—just install and activate.
+Smart TOC is a simple WordPress plugin that auto-generates a Table of Contents from post headings (< h2 >–< h6 >). It adds anchor links for easy navigation, improving UX and SEO. Lightweight, clean, and easy to use—just install and activate.
 
-\=== Smart TOC - Auto Table of Contents ===
-Contributors: Savio Dcruz
-Tags: table of contents, toc, navigation, headings, content, indexing
-Requires at least: 5.0
-Tested up to: 6.4
-Stable tag: 2.0.0
-Requires PHP: 7.0
-License: GPLv2 or later
-License URI: [http://www.gnu.org/licenses/gpl-2.0.html](http://www.gnu.org/licenses/gpl-2.0.html)
+=== Smart TOC - Auto Table of Contents ===
+<br>Contributors: Savio Dcruz
+<br>Tags: table of contents, toc, navigation, headings, content, indexing
+<br>Requires at least: 5.0
+<br>Tested up to: 6.4
+<br>Stable tag: 2.0.0
+<br>Requires PHP: 7.0
+<br>License: GPLv2 or later
+<br>License URI: [http://www.gnu.org/licenses/gpl-2.0.html](http://www.gnu.org/licenses/gpl-2.0.html)
 
 Automatically generate a Table of Contents for your posts based on headings with smooth styling and advanced customization options.
 
@@ -70,19 +70,19 @@ Automatically generate a Table of Contents for your posts based on headings with
 \== Frequently Asked Questions ==
 
 \= Can I customize the appearance of the TOC? =
-Absolutely! You can customize the TOC through the settings page using custom CSS. The plugin includes a built-in field for adding your custom styles.
+<br>Absolutely! You can customize the TOC through the settings page using custom CSS. The plugin includes a built-in field for adding your custom styles.
 
 \= Can I place the TOC manually instead of automatically? =
-Yes, you can disable automatic insertion and use the `[smart_toc]` shortcode to place the TOC exactly where you want it.
+<br>Yes, you can disable automatic insertion and use the `[smart_toc]` shortcode to place the TOC exactly where you want it.
 
 \= Will the TOC work with my theme? =
-Smart TOC is designed to work with any properly coded WordPress theme. The plugin uses its own styling that adapts to your theme's design.
+<br>Smart TOC is designed to work with any properly coded WordPress theme. The plugin uses its own styling that adapts to your theme's design.
 
 \= What if I don't want the TOC on a specific post? =
-You can disable the TOC for individual posts or pages through a meta box in the editor.
+<br>You can disable the TOC for individual posts or pages through a meta box in the editor.
 
 \= Can I change the TOC title? =
-Yes, you can customize the title of the TOC from the settings page.
+<br>Yes, you can customize the title of the TOC from the settings page.
 
 \== Screenshots ==
 
