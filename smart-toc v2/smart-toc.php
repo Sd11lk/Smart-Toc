@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Smart TOC
  * Description: Auto-generates a Table of Contents for your posts
- * Version: 1.0.0
+ * Version: 2.0.0
  * Author: Turginator
  * Text Domain: smart-toc
  * Domain Path: /languages
@@ -32,6 +32,9 @@ function smart_toc_activate() {
         'smooth_scroll' => 1,
         'custom_css' => ''
     ));
+
+    // Create necessary block files on activation
+    smart_toc_create_block_js();
 }
 
 // Plugin deactivation hook
@@ -75,11 +78,71 @@ function smart_toc_enqueue_scripts() {
     }
 }
 
+/**
+ * Automatically add ID attributes to heading tags in the content
+ * This runs before TOC insertion to ensure all headings have IDs
+ */
+add_filter('the_content', 'smart_toc_add_heading_ids', 9);
+function smart_toc_add_heading_ids($content) {
+    // Only process on single posts and pages in the main query
+    if (!is_singular() || !in_the_loop() || !is_main_query()) {
+        return $content;
+    }
+
+    // Process all heading tags H1-H6
+    $pattern = '/<(h[1-6]).*?>(.*?)<\/\1>/i';
+
+    // Find all headings
+    preg_match_all($pattern, $content, $matches, PREG_SET_ORDER);
+
+    // Track IDs to ensure uniqueness
+    $heading_ids = array();
+
+    // Process each heading
+    foreach ($matches as $match) {
+        $tag = $match[1]; // h1, h2, etc.
+        $heading_content = $match[2]; // Heading text
+        $full_heading = $match[0]; // The entire heading tag
+
+        // Check if heading already has an ID
+        if (strpos($full_heading, ' id=') !== false) {
+            continue; // Skip headings that already have an ID
+        }
+
+        // Create a unique ID from the heading text
+        $text = wp_strip_all_tags($heading_content);
+        $id = sanitize_title($text);
+
+        // Make sure ID is unique
+        if (isset($heading_ids[$id])) {
+            $heading_ids[$id]++;
+            $id .= '-' . $heading_ids[$id];
+        } else {
+            $heading_ids[$id] = 1;
+        }
+
+        // Replace the heading with one that has an ID
+        $new_heading = '<' . $tag . ' id="' . $id . '">' . $heading_content . '</' . $tag . '>';
+        $content = str_replace($full_heading, $new_heading, $content);
+    }
+
+    return $content;
+}
+
 // Auto-insert TOC into content
-add_filter('the_content', 'smart_toc_auto_insert');
+add_filter('the_content', 'smart_toc_auto_insert', 10);
 function smart_toc_auto_insert($content) {
     // Only process on single posts and pages in the main query
     if (!is_singular() || !in_the_loop() || !is_main_query()) {
+        return $content;
+    }
+
+    // Get post ID
+    $post_id = get_the_ID();
+
+    // Check if TOC is disabled for this specific post/page
+    $disable_toc = get_post_meta($post_id, '_smart_toc_disable', true);
+    if ($disable_toc === '1') {
         return $content;
     }
 
@@ -149,22 +212,28 @@ function smart_toc_generate($content) {
     // Process headings and build TOC
     $toc_items = array();
     $heading_ids = array();
-    $current_depth = array();
 
     foreach ($matches as $i => $match) {
         $tag = strtolower($match[1]); // h2, h3, etc.
         $level = (int) substr($tag, 1); // Get the heading level number
+        $full_heading = $match[0]; // The entire heading tag
         $text = wp_strip_all_tags($match[2]); // Get heading text without HTML
 
-        // Create a unique ID for the heading
-        $id = sanitize_title($text);
-
-        // Make sure ID is unique
-        if (isset($heading_ids[$id])) {
-            $heading_ids[$id]++;
-            $id .= '-' . $heading_ids[$id];
+        // Check if heading already has an ID
+        $id = '';
+        if (preg_match('/id=[\'"](.*?)[\'"]/i', $full_heading, $id_match)) {
+            $id = $id_match[1];
         } else {
-            $heading_ids[$id] = 1;
+            // Create a unique ID for the heading
+            $id = sanitize_title($text);
+
+            // Make sure ID is unique
+            if (isset($heading_ids[$id])) {
+                $heading_ids[$id]++;
+                $id .= '-' . $heading_ids[$id];
+            } else {
+                $heading_ids[$id] = 1;
+            }
         }
 
         // Add to TOC items
@@ -172,13 +241,6 @@ function smart_toc_generate($content) {
             'level' => $level,
             'text' => $text,
             'id' => $id
-        );
-
-        // Replace heading in content with one that has an ID
-        $content = str_replace(
-            $match[0],
-            '<' . $tag . ' id="' . $id . '">' . $match[2] . '</' . $tag . '>',
-            $content
         );
     }
 
@@ -265,6 +327,145 @@ function smart_toc_register_button($buttons) {
 function smart_toc_add_button($plugin_array) {
     $plugin_array['smart_toc_button'] = plugin_dir_url(__FILE__) . 'assets/js/tinymce-button.js';
     return $plugin_array;
+}
+
+/**
+ * Register Smart TOC Gutenberg block
+ */
+add_action('init', 'smart_toc_register_block');
+function smart_toc_register_block() {
+    // Skip if Gutenberg is not available
+    if (!function_exists('register_block_type')) {
+        return;
+    }
+
+    // Register block script
+    wp_register_script(
+        'smart-toc-block',
+        plugin_dir_url(__FILE__) . 'assets/js/block.js',
+        array('wp-blocks', 'wp-element', 'wp-editor', 'wp-components'),
+        SMART_TOC_VERSION,
+        true
+    );
+
+    // Register block editor styles
+    wp_register_style(
+        'smart-toc-block-editor',
+        plugin_dir_url(__FILE__) . 'assets/css/block-editor.css',
+        array('wp-edit-blocks'),
+        SMART_TOC_VERSION
+    );
+
+    // Register the block
+    register_block_type('smart-toc/toc-block', array(
+        'editor_script' => 'smart-toc-block',
+        'editor_style' => 'smart-toc-block-editor',
+        'render_callback' => 'smart_toc_render_block'
+    ));
+}
+
+/**
+ * Render callback for the TOC block
+ */
+function smart_toc_render_block($attributes, $content) {
+    // Get the content of the current post
+    global $post;
+    $post_content = $post->post_content;
+
+    // Generate TOC
+    return smart_toc_generate($post_content);
+}
+
+/**
+ * Create JS file for Gutenberg block
+ */
+function smart_toc_create_block_js() {
+    // Create directories if they don't exist
+    $js_dir = plugin_dir_path(__FILE__) . 'assets/js';
+    if (!file_exists($js_dir)) {
+        wp_mkdir_p($js_dir);
+    }
+
+    // Block JS file path
+    $js_file = $js_dir . '/block.js';
+
+    // Only create the file if it doesn't exist
+    if (!file_exists($js_file)) {
+        $js_content = "
+        /* Smart TOC Gutenberg Block */
+        (function(blocks, element, components, editor) {
+            var el = element.createElement;
+            var InspectorControls = editor.InspectorControls;
+            var PanelBody = components.PanelBody;
+            var ToggleControl = components.ToggleControl;
+            var ServerSideRender = wp.serverSideRender;
+
+            blocks.registerBlockType('smart-toc/toc-block', {
+                title: 'Smart Table of Contents',
+                icon: 'list-view',
+                category: 'widgets',
+
+                edit: function(props) {
+                    return [
+                        el(InspectorControls, {},
+                            el(PanelBody, {
+                                title: 'Settings',
+                                initialOpen: true
+                            },
+                                el('div', { className: 'smart-toc-block-settings' },
+                                    el('p', {}, 'The table of contents will be generated based on the headings in your content.')
+                                )
+                            )
+                        ),
+                        el('div', { className: props.className },
+                            el('div', { className: 'smart-toc-block-preview' },
+                                el('h3', {}, 'Table of Contents'),
+                                el('p', {}, 'This block will display a table of contents based on the headings in your content.')
+                            )
+                        )
+                    ];
+                },
+
+                save: function() {
+                    return null; // Dynamic block, rendered on server
+                }
+            });
+        })(
+            window.wp.blocks,
+            window.wp.element,
+            window.wp.components,
+            window.wp.blockEditor
+        );";
+
+        // Write the file
+        file_put_contents($js_file, $js_content);
+    }
+
+    // Block editor CSS file path
+    $css_dir = plugin_dir_path(__FILE__) . 'assets/css';
+    if (!file_exists($css_dir)) {
+        wp_mkdir_p($css_dir);
+    }
+
+    $css_file = $css_dir . '/block-editor.css';
+
+    // Only create the file if it doesn't exist
+    if (!file_exists($css_file)) {
+        $css_content = "
+        /* Smart TOC Block Editor Styles */
+        .smart-toc-block-preview {
+            padding: 16px;
+            border: 1px dashed #ccc;
+            background-color: #f8f8f8;
+        }
+
+        .smart-toc-block-preview h3 {
+            margin-top: 0;
+        }";
+
+        // Write the file
+        file_put_contents($css_file, $css_content);
+    }
 }
 
 // Add settings page
@@ -452,6 +653,7 @@ function smart_toc_meta_box_callback($post) {
     </p>
     <p class="description">
         You can also manually insert the TOC using the shortcode: <code>[smart_toc]</code>
+        or the Gutenberg block "Smart Table of Contents"
     </p>
     <?php
 }
